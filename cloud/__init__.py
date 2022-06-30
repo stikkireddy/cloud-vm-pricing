@@ -1,4 +1,5 @@
 import json
+import sys
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import Enum
@@ -58,6 +59,7 @@ class VMPricePerDBU:
     price_per_dbu: Optional[Decimal]
     region: str
     sku: str
+    multiplier: float
 
     @classmethod
     def from_vm_info(cls, vm_info: 'VMInfo', sku: PhotonSku = PhotonSku.NO_PHOTON, multiplier: float = 1.0):
@@ -69,7 +71,8 @@ class VMPricePerDBU:
             spot_price_per_dbu=(vm_info.price.spot_price_per_hr / dbus).quantize(Decimal('1e-4')),
             price_per_dbu=(vm_info.price.price_per_hr / dbus).quantize(Decimal('1e-4')),
             region=vm_info.price.region,
-            sku=str(sku)
+            sku=str(sku),
+            multiplier=multiplier
         )
 
     def json(self):
@@ -80,7 +83,8 @@ class VMPricePerDBU:
             "spot_price_per_dbu": self.spot_price_per_dbu,
             "price_per_dbu": self.price_per_dbu,
             "region": self.region,
-            "sku": self.sku
+            "sku": self.sku,
+            "multiplier": self.multiplier
         }
 
 
@@ -187,3 +191,6 @@ def get_price(region: str, vm_name: str) -> Optional[VMInfo]:
         return vm_info
 
     return None
+
+
+# print(json.dumps(get_price(region='eastus2', vm_name='Standard_E8ds_v4').json(), indent=4, cls=DecimalEncoder))
